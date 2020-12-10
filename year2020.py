@@ -246,14 +246,19 @@ def day9p1(raw_data):
             return number
 
 
+
+
 def day9p2(raw_data):
     numbers = [int(n) for n in raw_data.split()]
     key = day9p1(raw_data)
     l = len(numbers)
+    sum_before = [0]
+    for i, v in enumerate(numbers):
+        sum_before.append(sum_before[-1] + v)
     for i in range(2, l):
         for j in range(l - i):
             r = numbers[j:j + i]
-            s = sum(r)
+            s = sum_before[j + i] - sum_before[j]
             if s == key:
                 return min(r) + max(r)
 
