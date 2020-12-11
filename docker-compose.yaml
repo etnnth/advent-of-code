@@ -1,0 +1,6 @@
+version: '3.7'
+services:
+  advent-of-code:
+    build: .
+    volumes:
+    - .:/advent-of-code
