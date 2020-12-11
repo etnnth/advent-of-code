@@ -1,4 +1,3 @@
-import numpy
 import itertools
 import collections
 import copy

@@ -1,7 +1,6 @@
 import copy
 import math
 import itertools
-import numpy
 import collections
 import intcode
 
@@ -39,7 +38,7 @@ def day2p2(raw_data):
 
 
 def lines_intersect(lines):
-    points = [[0], [0]]
+    points = ([0], [0])
     for i, line in enumerate(lines):
         for command in line:
             if command[0] == "R":
@@ -52,9 +51,9 @@ def lines_intersect(lines):
                 direction = -1j
             for j in range(int(command[1:])):
                 points[i].append(points[i][-1] + direction)
-    distance = math.inf
-    points1, points2 = [*map(numpy.asarray, points)]
-    return points1, points2, numpy.intersect1d(points1, points2)
+    points1, points2 = points
+    intersection = set(points1).intersection(set(points2))
+    return points1, points2, intersection
 
 
 def day3p1(raw_data):
@@ -62,7 +61,7 @@ def day3p1(raw_data):
     distance = math.inf
     _, _, intersect = lines_intersect(lines)
     for p in intersect:
-        d = int(abs(numpy.real(p)) + abs(numpy.imag(p)))
+        d = int(abs(p.real) + abs(p.imag))
         if d > 0 and d < distance:
             distance = d
     return distance
@@ -73,7 +72,7 @@ def day3p2(raw_data):
     distance = math.inf
     points1, points2, intersect = lines_intersect(lines)
     for p in intersect:
-        d = numpy.argwhere(points1 == p)[0, 0] + numpy.argwhere(points2 == p)[0, 0]
+        d = points1.index(p) + points2.index(p)
         if d > 0 and d < distance:
             distance = d
     return distance
