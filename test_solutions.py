@@ -5,7 +5,7 @@ import year2019
 import year2020
 
 years = {
-        2019:10,
+        2019:9,
         2020:11
     }
 
@@ -14,8 +14,8 @@ tests = []
 
 
 for year, max_day in years.items():
-    tests += [(year, day, 1) for day in range(1, max_day)]
-    tests += [(year, day, 2) for day in range(1, max_day)]
+    tests += [(year, day, 1) for day in range(1, max_day + 1)]
+    tests += [(year, day, 2) for day in range(1, max_day + 1)]
 
 
 @pytest.mark.parametrize("year, day, part", tests)

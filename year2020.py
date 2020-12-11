@@ -209,6 +209,7 @@ def day8p1(raw_data):
         indexs.append(index)
     return acc
 
+
 def day8p2(raw_data):
     raw_lines = raw_data.split('\n')
     l = len(raw_lines)
@@ -237,15 +238,11 @@ def day8p2(raw_data):
             return acc
 
 
-
-
 def day9p1(raw_data):
     numbers = [int(n) for n in raw_data.split()]
     for i, number in enumerate(numbers[25:]):
         if number not in (a + b for a,b in itertools.combinations(numbers[i:i + 25], 2)):
             return number
-
-
 
 
 def day9p2(raw_data):
@@ -282,13 +279,98 @@ def day10p2(raw_data):
     return joltages[adapters[-1]]
 
 
+
+class Seats:
+    def __init__(self, raw_data):
+        self.seats = [list(r) for r in raw_data.split('\n')]
+        self.size = (len(self.seats), len(self.seats[0]))
+        self.directions = [d for d in itertools.product(range(-1, 2), repeat=2)if d != ( 0, 0)]
+        self.positions_seats = []
+        for i, j in itertools.product(*(range(s) for s in self.size)):
+            if self.seats[i][j] != '.':
+                self.positions_seats.append((i, j))
+        self.close_seats = collections.defaultdict(list)
+        for i, j in self.positions_seats:
+            self.add_close(i, j)
+        self.visible_seats = collections.defaultdict(list)
+        for i, j in self.positions_seats:
+            self.add_visible(i, j)
+
+    def add_close(self, i, j):
+        si, sj = self.size
+        for di, dj in self.directions:
+            if 0 <= i + di < si and 0 <= j + dj < sj and self.seats[i + di][j + dj] != '.':
+                self.close_seats[(i, j)].append((i + di, j + dj))
+
+    def add_visible(self, i, j):
+        si, sj = self.size
+        for di, dj in self.directions:
+            ii, jj = i, j
+            while 0 <= ii + di < si and 0 <= jj + dj < sj:
+                ii += di
+                jj += dj
+                if self.seats[ii][jj] != '.':
+                    if (ii, jj) != (i, j):
+                        self.visible_seats[(i, j)].append((ii, jj))
+                    break
+
+    def close_seats_count(self, i, j):
+        count = 0
+        for ii, jj in self.close_seats[(i, j)]:
+            if self.seats[ii][jj] == '#':
+                count += 1
+        return count
+
+    def changes_close(self):
+        changes = []
+        for i, j in self.positions_seats:
+            count = self.close_seats_count(i, j)
+            if self.seats[i][j] == '#' and count >= 4:
+                changes.append((i, j, 'L'))
+            elif self.seats[i][j] == 'L' and count == 0:
+                changes.append((i, j, '#'))
+        return changes
+
+    def visible_seats_count(self, i, j):
+        count = 0
+        si, sj = self.size
+        for ii, jj in self.visible_seats[(i, j)]:
+            if self.seats[ii][jj] == '#':
+                count += 1
+        return count
+
+    def changes_visible(self):
+        changes = []
+        for i, j in self.positions_seats:
+            count = self.visible_seats_count(i, j)
+            if self.seats[i][j] == '#' and count >= 5:
+                changes.append((i, j, 'L'))
+            elif self.seats[i][j] == 'L' and count == 0:
+                changes.append((i, j, '#'))
+        return changes
+
+    def count(self):
+        return sum(r.count('#') for r in self.seats)
+
+
 def day11p1(raw_data):
-    print(raw_data)
-    return 1
+    seats = Seats(raw_data)
+    for _ in range(1000):
+        changes = seats.changes_close()
+        if not changes:
+            return seats.count()
+        for (i, j, v) in changes:
+            seats.seats[i][j] = v
 
 
 def day11p2(raw_data):
-    return 2
+    seats = Seats(raw_data)
+    for _ in range(100):
+        changes = seats.changes_visible()
+        if not changes:
+            return seats.count()
+        for (i, j, v) in changes:
+            seats.seats[i][j] = v
 
 
 
