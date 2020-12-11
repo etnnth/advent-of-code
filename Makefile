@@ -8,4 +8,9 @@ sh: image.build
 	${RUN_IN_DOCKER} --entrypoint sh advent-of-code
 
 tests: image.build
+	${RUN_IN_DOCKER} advent-of-code pytest --durations=0 --benchmark-disable
+
+benchmark: image.build
 	${RUN_IN_DOCKER} advent-of-code pytest --durations=0
+
+

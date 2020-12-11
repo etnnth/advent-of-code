@@ -19,7 +19,7 @@ for year, max_day in years.items():
 
 
 @pytest.mark.parametrize("year, day, part", tests)
-def test_solution(year, day, part):
+def test_solution(year, day, part, benchmark):
     with database.Database(file) as db:
         raw_data = db.data(year, day)
         if part == 1:
@@ -27,7 +27,7 @@ def test_solution(year, day, part):
         elif part == 2:
             solution = db.solution2(year, day)
     exec(f"global func;func = year{year}.day{day}p{part}")
-    result = str(func(raw_data))
+    result = str(benchmark(func, raw_data=raw_data))
     assert result == solution
 
 
