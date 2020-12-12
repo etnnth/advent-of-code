@@ -372,4 +372,64 @@ def day11p2(raw_data):
             seats.seats[i][j] = v
 
 
+def day12p1(raw_data):
+    x, y = 0, 0
+    orientation = 0
+    moves = raw_data.split('\n')
+    for move in moves:
+        o, d = move[0], int(move[1:])
+        if o == 'N':
+            y += d
+        elif o == 'S':
+            y -= d
+        elif o == 'E':
+            x += d
+        elif o == 'W':
+            x -= d
+        elif o == 'F':
+            if orientation == 0:
+                x += d
+            if orientation == 180:
+                x -= d
+            if orientation == 90:
+                y -= d
+            if orientation == 270:
+                y += d
+        elif 'R' == o:
+            orientation += d
+            orientation += 360
+            orientation %= 360
+        elif 'L' == o:
+            orientation -= d
+            orientation += 3600
+            orientation %= 360
+        else:
+            print(move)
+    return abs(x) + abs(y)
 
+def day12p2(raw_data):
+    wx, wy = 10, 1
+    x, y = 0, 0
+    moves = raw_data.split('\n')
+    for move in moves:
+        o, d = move[0], int(move[1:])
+        if o == 'N':
+            wy += d
+        elif o == 'S':
+            wy -= d
+        elif o == 'E':
+            wx += d
+        elif o == 'W':
+            wx -= d
+        elif o == 'F':
+            x += wx * d
+            y += wy * d
+        elif 'R' == o:
+            wx, wy = wx * ( d == 0 ) - wx * ( d == 180 ) - wy * ( d == 270 ) + wy * ( d == 90 ), \
+                     wy * ( d == 0 ) - wy * ( d == 180 ) + wx * ( d == 270 ) - wx * ( d == 90 )
+        elif 'L' == o:
+            wx, wy = wx * ( d == 0 ) - wx * ( d == 180 ) + wy * ( d == 270 ) - wy * ( d == 90 ), \
+                     wy * ( d == 0 ) - wy * ( d == 180 ) - wx * ( d == 270 ) + wx * ( d == 90 )
+        else:
+            print(move)
+    return abs(x) + abs(y)
