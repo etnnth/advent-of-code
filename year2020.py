@@ -1,6 +1,7 @@
 import itertools
 import collections
 import copy
+import math
 
 
 def day1p1(raw_data):
@@ -433,3 +434,33 @@ def day12p2(raw_data):
         else:
             print(move)
     return abs(x) + abs(y)
+
+
+def day13p1(raw_data):
+    time, buses = raw_data.split('\n')
+    time = int(time)
+    buses = [int(b) for b in buses.split(',') if b not in 'x']
+    depart_time = math.inf
+    bus_id = 0
+    for b in buses:
+        t = math.ceil(time/b) * b
+        if depart_time > t:
+            depart_time = t
+            bus_id = b
+    return (depart_time - time) * bus_id
+
+
+def day13p2(raw_data):
+    _, buses = raw_data.split('\n')
+    buses = [(int(b), i) for i, b in enumerate(buses.split(',')) if b not in 'x']
+    timestamp = 0
+    step = 1
+    for b, i in buses:
+        while (timestamp + i) % b != 0:
+            timestamp += step
+        step = (step * b) // math.gcd(step, b)
+    return timestamp
+
+
+
+
