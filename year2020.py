@@ -464,3 +464,37 @@ def day13p2(raw_data):
 
 
 
+
+def day14p1(raw_data):
+    lines = raw_data.split('\n')
+    mem = {}
+    for line in lines:
+        if 'mask' in line:
+            mask = line.split(' = ')[-1]
+        if 'mem' in line:
+            value = bin(int(line.split(' = ')[-1]))[2:].rjust(36, '0')
+            addr = int(line.split(']')[0][4:])
+            result = ''.join([m if m != 'X' else v for v, m in zip(value, mask)])
+            mem[addr] = int(result, 2)
+    return sum([m for m in mem.values()])
+
+
+def day14p2(raw_data):
+    lines = raw_data.split('\n')
+    mem = {}
+    for line in lines:
+        if 'mask' in line:
+            mask = line.split(' = ')[-1]
+        if 'mem' in line:
+            value = int(line.split(' = ')[-1])
+            addr = bin(int(line.split(']')[0][4:]))[2:].rjust(36, '0')
+            result = [m if m != '0' else v for v, m in zip(addr, mask)]
+            positions = [i for i, v in enumerate(result) if v == 'X']
+            count = result.count('X')
+            for bits in itertools.product(['0', '1'], repeat=count):
+                for p, b in zip(positions, bits):
+                    result[p] = b
+                mem[int(''.join(result), 2)] = value
+    return sum([m for m in mem.values()])
+
+
