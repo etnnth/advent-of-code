@@ -528,11 +528,62 @@ def day15p2(raw_data):
 
 
 
+def day16p1(raw_data):
+    rules, my_ticket, tickets = raw_data.split('\n\n')
+    rules = [ [ [int(v) for v in r.split('-')]
+            for r in rule.split(': ')[-1].split('or')]
+            for rule in rules.split('\n')]
+    tickets = [[int(v) for v in ticket.split(',')] for ticket in tickets.split('\n')[1:]]
+    count = 0
+    for ticket in tickets:
+        for value in ticket:
+            if all(
+                    not ((r1[0] <= value <= r1[1]) or (r2[0] <= value <= r2[1]))
+                    for r1, r2 in rules
+                    ):
+                count += value
+    return count
 
 
 
+def day16p2(raw_data):
+    rules_raw, my_ticket, tickets = raw_data.split('\n\n')
+    rules = [ [ [int(v) for v in r.split('-')]
+            for r in rule.split(': ')[-1].split('or')]
+            for rule in rules_raw.split('\n')]
+    tickets = [[int(v) for v in ticket.split(',')] for ticket in tickets.split('\n')[1:]]
+    my_ticket = [int(v) for v in my_ticket.split('\n')[1].split(',')]
+    rules_number = len(rules)
 
+    # combinations is a list of list of rule index that are valid for all valid tickets
+    combinations = [[*range(rules_number)] for _ in range(rules_number)]
+    for ticket in tickets:
+        if all(
+                any([(r1[0] <= value <= r1[1]) or (r2[0] <= value <= r2[1])
+                for r1, r2 in rules])
+                for value in ticket
+                ):
+            combinations = [
+                    [c for c in comb if (rules[c][0][0] <= v <= rules[c][0][1])
+                        or (rules[c][1][0] <= v <= rules[c][1][1])
+                        ] for v, comb in zip(ticket, combinations)
+                    ]
 
+    comb = [None for c in combinations]
+    while any(len(c) > 0 for c in combinations):
+        for i in range(rules_number):
+            if len(combinations[i]) == 1:
+                comb[i] = combinations[i][0]
+                for c in combinations:
+                    if comb[i] in c:
+                        c.remove(comb[i])
+
+    count = 1
+    list_rules = rules_raw.split('\n')
+    for i, c in enumerate(comb):
+        if "departure" in list_rules[c]:
+            count *= my_ticket[i]
+    return count
 
 
 
