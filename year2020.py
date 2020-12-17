@@ -586,6 +586,58 @@ def day16p2(raw_data):
     return count
 
 
+class ConwayND:
+    def __init__(self, raw_data, dim):
+        cube = [r for r in raw_data.split('\n')]
+        self.dir = [d for d in itertools.product(range(-1, 2), repeat=dim) if d != tuple([0]*dim)]
+        self.active = set()
+        for i,j in itertools.product(range(len(cube)), range(len(cube[0]))):
+            if cube[i][j] == '#':
+                self.active.add(tuple([i, j] + [0] * (dim - 2)))
+
+    def iteration(self):
+        to_activate = set()
+        to_deactivate = set()
+        inactive_neighbor = set()
+        for position in self.active:
+            for di in self.dir:
+                neighbor = tuple(p + d for p, d in zip(position, di))
+                if neighbor not in self.active:
+                    inactive_neighbor.add(neighbor)
+
+        for position in inactive_neighbor:
+            if self.count_active_neighbors(position) == 3:
+                to_activate.add(position)
+        for position in self.active:
+            if self.count_active_neighbors(position) not in (2, 3):
+                to_deactivate.add(position)
+
+        for position in to_deactivate:
+            self.active.remove(position)
+        for position in to_activate:
+            self.active.add(position)
+
+    def count_active_neighbors(self, position):
+        count = 0
+        for di in self.dir:
+            if tuple(p + d for p, d in zip(position, di)) in self.active:
+                count += 1
+        return count
+
+
+def day17p1(raw_data):
+    cube = ConwayND(raw_data, 3)
+    for _ in range(6):
+        cube.iteration()
+    return len(cube.active)
+
+
+def day17p2(raw_data):
+    cube = ConwayND(raw_data, 4)
+    for _ in range(6):
+        cube.iteration()
+    return len(cube.active)
+
 
 
 
