@@ -4,10 +4,7 @@ import pytest
 import year2019
 import year2020
 
-years = {
-        2019:9,
-        2020:17
-    }
+years = {2019: 9, 2020: 17}
 
 file = "datas.db"
 tests = []
@@ -29,8 +26,3 @@ def test_solution(year, day, part, benchmark):
     exec(f"global func;func = year{year}.day{day}p{part}")
     result = str(benchmark(func, raw_data=raw_data))
     assert result == solution
-
-
-
-
-

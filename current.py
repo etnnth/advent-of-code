@@ -7,7 +7,7 @@ year = 2020
 day = 17
 f = f"year{year}.day{day}"
 
-with database.Database('datas.db') as db:
+with database.Database("datas.db") as db:
     raw_data = db.data(year, day)
 
 test_data1 = """.#.

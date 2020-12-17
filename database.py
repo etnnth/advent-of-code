@@ -77,7 +77,6 @@ class Database:
         self.connection.commit()
 
 
-
 if __name__ == "__main__":
     import fetch
 

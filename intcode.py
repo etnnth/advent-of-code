@@ -1,5 +1,3 @@
-
-
 class Computer:
     def __init__(self, index, program):
         self.index = index
@@ -7,7 +5,7 @@ class Computer:
         self.modes = [0, 0, 0]
         self.rel = 0
 
-    def run(self, inputs = None):
+    def run(self, inputs=None):
         while True:
             instruction = self.program[self.index]
             instruction, optcode = divmod(instruction, 100)
@@ -50,7 +48,6 @@ class Computer:
                 self.rel += self.get(1)
                 self.index += 2
 
-
     def get(self, index):
         mode = self.modes[index - 1]
         if mode == 0:
@@ -68,5 +65,3 @@ class Computer:
             self.program[self.index + index] = value
         elif mode == 2:
             self.program[self.program[self.index + index] + self.rel] = value
-
-

@@ -129,19 +129,19 @@ def day5p2(raw_data):
             return n + 1
 
 
-
 def day6p1(raw_data):
-    groups = raw_data.split('\n\n')
+    groups = raw_data.split("\n\n")
     count = 0
     for group in groups:
-        count += len(set(group.replace('\n','')))
+        count += len(set(group.replace("\n", "")))
     return count
 
+
 def day6p2(raw_data):
-    groups = raw_data.split('\n\n')
+    groups = raw_data.split("\n\n")
     count = 0
     for group in groups:
-        answers = group.split('\n')
+        answers = group.split("\n")
         common_answers = set(answers[0])
         for a in answers:
             common_answers &= set(a)
@@ -154,13 +154,13 @@ def parse7(raw_data):
     raw_data = raw_data.replace(" contain ", ",").replace(", ", ",")
     contain = collections.defaultdict(list)
     is_contained = collections.defaultdict(list)
-    for rule in raw_data.split('\n'):
-        bags = rule.split(',')
+    for rule in raw_data.split("\n"):
+        bags = rule.split(",")
         base = bags.pop(0)
         for bag in bags[:]:
             if bag != "no other":
-                quantity = int(bag.split(' ')[0])
-                bag = ' '.join(bag.split(' ')[1:])
+                quantity = int(bag.split(" ")[0])
+                bag = " ".join(bag.split(" ")[1:])
                 contain[base].append((quantity, bag))
                 is_contained[bag].append(base)
     return contain, is_contained
@@ -177,8 +177,9 @@ def day7p1(raw_data):
                 available_colors.add(bag)
     return len(available_colors) - 1
 
+
 def day7p2(raw_data):
-    contain, _= parse7(raw_data)
+    contain, _ = parse7(raw_data)
     counter = 0
     stack = [(1, "shiny gold")]
     while stack:
@@ -190,9 +191,8 @@ def day7p2(raw_data):
     return counter
 
 
-
 def day8p1(raw_data):
-    lines = raw_data.split('\n')
+    lines = raw_data.split("\n")
     acc = 0
     index = 0
     indexs = [0]
@@ -200,10 +200,10 @@ def day8p1(raw_data):
         if "nop" in lines[index]:
             index += 1
         elif "acc" in lines[index]:
-            acc += int(lines[index].split(' ')[-1])
+            acc += int(lines[index].split(" ")[-1])
             index += 1
         elif "jmp" in lines[index]:
-            index += int(lines[index].split(' ')[-1])
+            index += int(lines[index].split(" ")[-1])
         if index in indexs:
             break
         indexs.append(index)
@@ -211,9 +211,11 @@ def day8p1(raw_data):
 
 
 def day8p2(raw_data):
-    raw_lines = raw_data.split('\n')
+    raw_lines = raw_data.split("\n")
     l = len(raw_lines)
-    positions = [i for i, line in enumerate(raw_lines) if "jmp" in line or "nop" in line]
+    positions = [
+        i for i, line in enumerate(raw_lines) if "jmp" in line or "nop" in line
+    ]
     for position in positions:
         lines = copy.copy(raw_lines)
         if "jmp" in lines[position]:
@@ -227,10 +229,10 @@ def day8p2(raw_data):
             if "nop" in lines[index]:
                 index += 1
             elif "acc" in lines[index]:
-                acc += int(lines[index].split(' ')[-1])
+                acc += int(lines[index].split(" ")[-1])
                 index += 1
             elif "jmp" in lines[index]:
-                index += int(lines[index].split(' ')[-1])
+                index += int(lines[index].split(" ")[-1])
             if index in indexs or index >= l or index < 0:
                 break
             indexs.append(index)
@@ -241,7 +243,9 @@ def day8p2(raw_data):
 def day9p1(raw_data):
     numbers = [int(n) for n in raw_data.split()]
     for i, number in enumerate(numbers[25:]):
-        if number not in (a + b for a,b in itertools.combinations(numbers[i:i + 25], 2)):
+        if number not in (
+            a + b for a, b in itertools.combinations(numbers[i : i + 25], 2)
+        ):
             return number
 
 
@@ -254,14 +258,14 @@ def day9p2(raw_data):
         sum_before.append(sum_before[-1] + v)
     for i in range(2, l):
         for j in range(l - i):
-            r = numbers[j:j + i]
+            r = numbers[j : j + i]
             s = sum_before[j + i] - sum_before[j]
             if s == key:
                 return min(r) + max(r)
 
 
 def day10p1(raw_data):
-    adapters = [int(i) for i in raw_data.split('\n')]
+    adapters = [int(i) for i in raw_data.split("\n")]
     adapters.sort()
     joltages = [0] + adapters + [adapters[-1] + 3]
     diff = [l - f for l, f in zip(joltages[1:], joltages[:-1])]
@@ -269,25 +273,26 @@ def day10p1(raw_data):
 
 
 def day10p2(raw_data):
-    adapters =[int(i) for i in raw_data.split('\n')]
+    adapters = [int(i) for i in raw_data.split("\n")]
     adapters.sort()
     joltages = collections.defaultdict(int)
     joltages[0] = 1
     for adapter in adapters:
         for i in range(1, 4):
-            joltages[adapter] += joltages[adapter -i]
+            joltages[adapter] += joltages[adapter - i]
     return joltages[adapters[-1]]
-
 
 
 class Seats:
     def __init__(self, raw_data):
-        self.seats = [list(r) for r in raw_data.split('\n')]
+        self.seats = [list(r) for r in raw_data.split("\n")]
         self.size = (len(self.seats), len(self.seats[0]))
-        self.directions = [d for d in itertools.product(range(-1, 2), repeat=2)if d != ( 0, 0)]
+        self.directions = [
+            d for d in itertools.product(range(-1, 2), repeat=2) if d != (0, 0)
+        ]
         self.positions_seats = []
         for i, j in itertools.product(*(range(s) for s in self.size)):
-            if self.seats[i][j] != '.':
+            if self.seats[i][j] != ".":
                 self.positions_seats.append((i, j))
         self.close_seats = collections.defaultdict(list)
         for i, j in self.positions_seats:
@@ -299,7 +304,11 @@ class Seats:
     def add_close(self, i, j):
         si, sj = self.size
         for di, dj in self.directions:
-            if 0 <= i + di < si and 0 <= j + dj < sj and self.seats[i + di][j + dj] != '.':
+            if (
+                0 <= i + di < si
+                and 0 <= j + dj < sj
+                and self.seats[i + di][j + dj] != "."
+            ):
                 self.close_seats[(i, j)].append((i + di, j + dj))
 
     def add_visible(self, i, j):
@@ -309,7 +318,7 @@ class Seats:
             while 0 <= ii + di < si and 0 <= jj + dj < sj:
                 ii += di
                 jj += dj
-                if self.seats[ii][jj] != '.':
+                if self.seats[ii][jj] != ".":
                     if (ii, jj) != (i, j):
                         self.visible_seats[(i, j)].append((ii, jj))
                     break
@@ -317,7 +326,7 @@ class Seats:
     def close_seats_count(self, i, j):
         count = 0
         for ii, jj in self.close_seats[(i, j)]:
-            if self.seats[ii][jj] == '#':
+            if self.seats[ii][jj] == "#":
                 count += 1
         return count
 
@@ -325,17 +334,17 @@ class Seats:
         changes = []
         for i, j in self.positions_seats:
             count = self.close_seats_count(i, j)
-            if self.seats[i][j] == '#' and count >= 4:
-                changes.append((i, j, 'L'))
-            elif self.seats[i][j] == 'L' and count == 0:
-                changes.append((i, j, '#'))
+            if self.seats[i][j] == "#" and count >= 4:
+                changes.append((i, j, "L"))
+            elif self.seats[i][j] == "L" and count == 0:
+                changes.append((i, j, "#"))
         return changes
 
     def visible_seats_count(self, i, j):
         count = 0
         si, sj = self.size
         for ii, jj in self.visible_seats[(i, j)]:
-            if self.seats[ii][jj] == '#':
+            if self.seats[ii][jj] == "#":
                 count += 1
         return count
 
@@ -343,14 +352,14 @@ class Seats:
         changes = []
         for i, j in self.positions_seats:
             count = self.visible_seats_count(i, j)
-            if self.seats[i][j] == '#' and count >= 5:
-                changes.append((i, j, 'L'))
-            elif self.seats[i][j] == 'L' and count == 0:
-                changes.append((i, j, '#'))
+            if self.seats[i][j] == "#" and count >= 5:
+                changes.append((i, j, "L"))
+            elif self.seats[i][j] == "L" and count == 0:
+                changes.append((i, j, "#"))
         return changes
 
     def count(self):
-        return sum(r.count('#') for r in self.seats)
+        return sum(r.count("#") for r in self.seats)
 
 
 def day11p1(raw_data):
@@ -376,18 +385,18 @@ def day11p2(raw_data):
 def day12p1(raw_data):
     x, y = 0, 0
     orientation = 0
-    moves = raw_data.split('\n')
+    moves = raw_data.split("\n")
     for move in moves:
         o, d = move[0], int(move[1:])
-        if o == 'N':
+        if o == "N":
             y += d
-        elif o == 'S':
+        elif o == "S":
             y -= d
-        elif o == 'E':
+        elif o == "E":
             x += d
-        elif o == 'W':
+        elif o == "W":
             x -= d
-        elif o == 'F':
+        elif o == "F":
             if orientation == 0:
                 x += d
             if orientation == 180:
@@ -396,11 +405,11 @@ def day12p1(raw_data):
                 y -= d
             if orientation == 270:
                 y += d
-        elif 'R' == o:
+        elif "R" == o:
             orientation += d
             orientation += 360
             orientation %= 360
-        elif 'L' == o:
+        elif "L" == o:
             orientation -= d
             orientation += 3600
             orientation %= 360
@@ -408,42 +417,47 @@ def day12p1(raw_data):
             print(move)
     return abs(x) + abs(y)
 
+
 def day12p2(raw_data):
     wx, wy = 10, 1
     x, y = 0, 0
-    moves = raw_data.split('\n')
+    moves = raw_data.split("\n")
     for move in moves:
         o, d = move[0], int(move[1:])
-        if o == 'N':
+        if o == "N":
             wy += d
-        elif o == 'S':
+        elif o == "S":
             wy -= d
-        elif o == 'E':
+        elif o == "E":
             wx += d
-        elif o == 'W':
+        elif o == "W":
             wx -= d
-        elif o == 'F':
+        elif o == "F":
             x += wx * d
             y += wy * d
-        elif 'R' == o:
-            wx, wy = wx * ( d == 0 ) - wx * ( d == 180 ) - wy * ( d == 270 ) + wy * ( d == 90 ), \
-                     wy * ( d == 0 ) - wy * ( d == 180 ) + wx * ( d == 270 ) - wx * ( d == 90 )
-        elif 'L' == o:
-            wx, wy = wx * ( d == 0 ) - wx * ( d == 180 ) + wy * ( d == 270 ) - wy * ( d == 90 ), \
-                     wy * ( d == 0 ) - wy * ( d == 180 ) - wx * ( d == 270 ) + wx * ( d == 90 )
+        elif "R" == o:
+            wx, wy = (
+                wx * (d == 0) - wx * (d == 180) - wy * (d == 270) + wy * (d == 90),
+                wy * (d == 0) - wy * (d == 180) + wx * (d == 270) - wx * (d == 90),
+            )
+        elif "L" == o:
+            wx, wy = (
+                wx * (d == 0) - wx * (d == 180) + wy * (d == 270) - wy * (d == 90),
+                wy * (d == 0) - wy * (d == 180) - wx * (d == 270) + wx * (d == 90),
+            )
         else:
             print(move)
     return abs(x) + abs(y)
 
 
 def day13p1(raw_data):
-    time, buses = raw_data.split('\n')
+    time, buses = raw_data.split("\n")
     time = int(time)
-    buses = [int(b) for b in buses.split(',') if b not in 'x']
+    buses = [int(b) for b in buses.split(",") if b not in "x"]
     depart_time = math.inf
     bus_id = 0
     for b in buses:
-        t = math.ceil(time/b) * b
+        t = math.ceil(time / b) * b
         if depart_time > t:
             depart_time = t
             bus_id = b
@@ -451,8 +465,8 @@ def day13p1(raw_data):
 
 
 def day13p2(raw_data):
-    _, buses = raw_data.split('\n')
-    buses = [(int(b), i) for i, b in enumerate(buses.split(',')) if b not in 'x']
+    _, buses = raw_data.split("\n")
+    buses = [(int(b), i) for i, b in enumerate(buses.split(",")) if b not in "x"]
     timestamp = 0
     step = 1
     for b, i in buses:
@@ -462,44 +476,41 @@ def day13p2(raw_data):
     return timestamp
 
 
-
-
-
 def day14p1(raw_data):
-    lines = raw_data.split('\n')
+    lines = raw_data.split("\n")
     mem = {}
     for line in lines:
-        if 'mask' in line:
-            mask = line.split(' = ')[-1]
-        if 'mem' in line:
-            value = bin(int(line.split(' = ')[-1]))[2:].rjust(36, '0')
-            addr = int(line.split(']')[0][4:])
-            result = ''.join([m if m != 'X' else v for v, m in zip(value, mask)])
+        if "mask" in line:
+            mask = line.split(" = ")[-1]
+        if "mem" in line:
+            value = bin(int(line.split(" = ")[-1]))[2:].rjust(36, "0")
+            addr = int(line.split("]")[0][4:])
+            result = "".join([m if m != "X" else v for v, m in zip(value, mask)])
             mem[addr] = int(result, 2)
     return sum([m for m in mem.values()])
 
 
 def day14p2(raw_data):
-    lines = raw_data.split('\n')
+    lines = raw_data.split("\n")
     mem = {}
     for line in lines:
-        if 'mask' in line:
-            mask = line.split(' = ')[-1]
-        if 'mem' in line:
-            value = int(line.split(' = ')[-1])
-            addr = bin(int(line.split(']')[0][4:]))[2:].rjust(36, '0')
-            result = [m if m != '0' else v for v, m in zip(addr, mask)]
-            positions = [i for i, v in enumerate(result) if v == 'X']
-            count = result.count('X')
-            for bits in itertools.product(['0', '1'], repeat=count):
+        if "mask" in line:
+            mask = line.split(" = ")[-1]
+        if "mem" in line:
+            value = int(line.split(" = ")[-1])
+            addr = bin(int(line.split("]")[0][4:]))[2:].rjust(36, "0")
+            result = [m if m != "0" else v for v, m in zip(addr, mask)]
+            positions = [i for i, v in enumerate(result) if v == "X"]
+            count = result.count("X")
+            for bits in itertools.product(["0", "1"], repeat=count):
                 for p, b in zip(positions, bits):
                     result[p] = b
-                mem[int(''.join(result), 2)] = value
+                mem[int("".join(result), 2)] = value
     return sum([m for m in mem.values()])
 
 
 def day15p1(raw_data):
-    numbers = [int(i) for i in raw_data.split(',')]
+    numbers = [int(i) for i in raw_data.split(",")]
     while len(numbers) < 2020:
         if numbers[-1] not in numbers[:-1]:
             numbers.append(0)
@@ -510,7 +521,7 @@ def day15p1(raw_data):
 
 def day15p2(raw_data):
     positions = {}
-    numbers = [int(i) for i in raw_data.split(',')]
+    numbers = [int(i) for i in raw_data.split(",")]
     for i, n in enumerate(numbers[:-1]):
         positions[n] = i + 1
     index = len(numbers)
@@ -525,49 +536,59 @@ def day15p2(raw_data):
     return number
 
 
-
-
-
 def day16p1(raw_data):
-    rules, my_ticket, tickets = raw_data.split('\n\n')
-    rules = [ [ [int(v) for v in r.split('-')]
-            for r in rule.split(': ')[-1].split('or')]
-            for rule in rules.split('\n')]
-    tickets = [[int(v) for v in ticket.split(',')] for ticket in tickets.split('\n')[1:]]
+    rules, my_ticket, tickets = raw_data.split("\n\n")
+    rules = [
+        [[int(v) for v in r.split("-")] for r in rule.split(": ")[-1].split("or")]
+        for rule in rules.split("\n")
+    ]
+    tickets = [
+        [int(v) for v in ticket.split(",")] for ticket in tickets.split("\n")[1:]
+    ]
     count = 0
     for ticket in tickets:
         for value in ticket:
             if all(
-                    not ((r1[0] <= value <= r1[1]) or (r2[0] <= value <= r2[1]))
-                    for r1, r2 in rules
-                    ):
+                not ((r1[0] <= value <= r1[1]) or (r2[0] <= value <= r2[1]))
+                for r1, r2 in rules
+            ):
                 count += value
     return count
 
 
-
 def day16p2(raw_data):
-    rules_raw, my_ticket, tickets = raw_data.split('\n\n')
-    rules = [ [ [int(v) for v in r.split('-')]
-            for r in rule.split(': ')[-1].split('or')]
-            for rule in rules_raw.split('\n')]
-    tickets = [[int(v) for v in ticket.split(',')] for ticket in tickets.split('\n')[1:]]
-    my_ticket = [int(v) for v in my_ticket.split('\n')[1].split(',')]
+    rules_raw, my_ticket, tickets = raw_data.split("\n\n")
+    rules = [
+        [[int(v) for v in r.split("-")] for r in rule.split(": ")[-1].split("or")]
+        for rule in rules_raw.split("\n")
+    ]
+    tickets = [
+        [int(v) for v in ticket.split(",")] for ticket in tickets.split("\n")[1:]
+    ]
+    my_ticket = [int(v) for v in my_ticket.split("\n")[1].split(",")]
     rules_number = len(rules)
 
     # combinations is a list of list of rule index that are valid for all valid tickets
     combinations = [[*range(rules_number)] for _ in range(rules_number)]
     for ticket in tickets:
         if all(
-                any([(r1[0] <= value <= r1[1]) or (r2[0] <= value <= r2[1])
-                for r1, r2 in rules])
-                for value in ticket
-                ):
+            any(
+                [
+                    (r1[0] <= value <= r1[1]) or (r2[0] <= value <= r2[1])
+                    for r1, r2 in rules
+                ]
+            )
+            for value in ticket
+        ):
             combinations = [
-                    [c for c in comb if (rules[c][0][0] <= v <= rules[c][0][1])
-                        or (rules[c][1][0] <= v <= rules[c][1][1])
-                        ] for v, comb in zip(ticket, combinations)
-                    ]
+                [
+                    c
+                    for c in comb
+                    if (rules[c][0][0] <= v <= rules[c][0][1])
+                    or (rules[c][1][0] <= v <= rules[c][1][1])
+                ]
+                for v, comb in zip(ticket, combinations)
+            ]
 
     comb = [None for c in combinations]
     while any(len(c) > 0 for c in combinations):
@@ -579,7 +600,7 @@ def day16p2(raw_data):
                         c.remove(comb[i])
 
     count = 1
-    list_rules = rules_raw.split('\n')
+    list_rules = rules_raw.split("\n")
     for i, c in enumerate(comb):
         if "departure" in list_rules[c]:
             count *= my_ticket[i]
@@ -588,11 +609,15 @@ def day16p2(raw_data):
 
 class ConwayND:
     def __init__(self, raw_data, dim):
-        cube = [r for r in raw_data.split('\n')]
-        self.dir = [d for d in itertools.product(range(-1, 2), repeat=dim) if d != tuple([0]*dim)]
+        cube = [r for r in raw_data.split("\n")]
+        self.dir = [
+            d
+            for d in itertools.product(range(-1, 2), repeat=dim)
+            if d != tuple([0] * dim)
+        ]
         self.active = set()
-        for i,j in itertools.product(range(len(cube)), range(len(cube[0]))):
-            if cube[i][j] == '#':
+        for i, j in itertools.product(range(len(cube)), range(len(cube[0]))):
+            if cube[i][j] == "#":
                 self.active.add(tuple([i, j] + [0] * (dim - 2)))
 
     def iteration(self):
@@ -637,12 +662,3 @@ def day17p2(raw_data):
     for _ in range(6):
         cube.iteration()
     return len(cube.active)
-
-
-
-
-
-
-
-
-

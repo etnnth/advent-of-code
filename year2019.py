@@ -4,6 +4,7 @@ import itertools
 import collections
 import intcode
 
+
 def day1p1(raw_data):
     return sum(int(m) // 3 - 2 for m in raw_data.split("\n"))
 
@@ -79,10 +80,10 @@ def day3p2(raw_data):
 
 
 def day4p1(raw_data):
-    minimum, maximum = [int(i) for i in raw_data.split('-')]
+    minimum, maximum = [int(i) for i in raw_data.split("-")]
     counter = 0
     for comb in itertools.combinations_with_replacement("0123456789", 6):
-        n = ''.join(comb)
+        n = "".join(comb)
         if int(n) > maximum:
             break
         if int(n) < minimum:
@@ -91,11 +92,12 @@ def day4p1(raw_data):
             counter += 1
     return counter
 
+
 def day4p2(raw_data):
-    minimum, maximum = [int(i) for i in raw_data.split('-')]
+    minimum, maximum = [int(i) for i in raw_data.split("-")]
     counter = 0
     for comb in itertools.combinations_with_replacement("0123456789", 6):
-        n = ''.join(comb)
+        n = "".join(comb)
         if int(n) > maximum:
             break
         if int(n) < minimum:
@@ -104,16 +106,18 @@ def day4p2(raw_data):
             counter += 1
     return counter
 
+
 def day5p1(raw_data):
-    program = [int(i) for i in raw_data.split(',')]
+    program = [int(i) for i in raw_data.split(",")]
     computer = intcode.Computer(0, program)
     outputs = ["START"]
     while outputs[-1] != "HALT":
         outputs.append(computer.run([1]))
     return outputs[-2]
 
+
 def day5p2(raw_data):
-    program = [int(i) for i in raw_data.split(',')]
+    program = [int(i) for i in raw_data.split(",")]
     computer = intcode.Computer(0, program)
     outputs = ["START"]
     while outputs[-1] != "HALT":
@@ -123,8 +127,8 @@ def day5p2(raw_data):
 
 def day6p1(raw_data):
     orbits = collections.defaultdict(list)
-    for orbit in raw_data.split('\n'):
-        a, b = orbit.split(')')
+    for orbit in raw_data.split("\n"):
+        a, b = orbit.split(")")
         orbits[a].append(b)
     counter = 0
     stack = [("COM", 0)]
@@ -135,10 +139,11 @@ def day6p1(raw_data):
             stack.append((o, n + 1))
     return counter
 
+
 def day6p2(raw_data):
     precedent = collections.defaultdict(str)
-    for orbit in raw_data.split('\n'):
-        a, b = orbit.split(')')
+    for orbit in raw_data.split("\n"):
+        a, b = orbit.split(")")
         precedent[b] = a
     san_to_com = ["SAN"]
     you_to_com = ["YOU"]
@@ -152,7 +157,7 @@ def day6p2(raw_data):
 
 
 def day7p1(raw_data):
-    program = [int(i) for i in raw_data.split(',')]
+    program = [int(i) for i in raw_data.split(",")]
     maximum = 0
     for sequence in itertools.permutations([*range(5)]):
         signal = 0
@@ -163,8 +168,9 @@ def day7p1(raw_data):
             maximum = signal
     return maximum
 
+
 def day7p2(raw_data):
-    program = [int(i) for i in raw_data.split(',')]
+    program = [int(i) for i in raw_data.split(",")]
     maximum = 0
     for sequence in itertools.permutations([*range(5, 10)]):
         signals = [0] * 5
@@ -186,49 +192,49 @@ def day7p2(raw_data):
 
 def day8p1(raw_data):
     layer_size = 25 * 6
-    layers = [raw_data[i*layer_size:(i+1)*layer_size]
-            for i in range(len(raw_data)//layer_size)]
-    count_0_per_layers = [l.count('0') for l in layers]
+    layers = [
+        raw_data[i * layer_size : (i + 1) * layer_size]
+        for i in range(len(raw_data) // layer_size)
+    ]
+    count_0_per_layers = [l.count("0") for l in layers]
     pos_min = count_0_per_layers.index(min(count_0_per_layers))
-    return layers[pos_min].count('1') * layers[pos_min].count('2')
+    return layers[pos_min].count("1") * layers[pos_min].count("2")
+
 
 def day8p2(raw_data):
     layer_size = 25 * 6
-    layers = [raw_data[i*layer_size:(i+1)*layer_size]
-            for i in range(len(raw_data)//layer_size)]
-    image = [list(layers[0][i*25:(i+1)*25]) for i in range(6)]
+    layers = [
+        raw_data[i * layer_size : (i + 1) * layer_size]
+        for i in range(len(raw_data) // layer_size)
+    ]
+    image = [list(layers[0][i * 25 : (i + 1) * 25]) for i in range(6)]
     for i, j in itertools.product(range(25), range(6)):
         for layer in layers:
-            if layer[i + 25*j] != '2':
-                image[j][i] = {'1':'#', '0':' '}[layer[i + 25*j]]
+            if layer[i + 25 * j] != "2":
+                image[j][i] = {"1": "#", "0": " "}[layer[i + 25 * j]]
                 break
-    print(*map(''.join,image), sep='\n')
-    return 'LBRCE'
+    print(*map("".join, image), sep="\n")
+    return "LBRCE"
 
 
 def day9p1(raw_data):
-    program = {i:int(v) for i, v in enumerate(raw_data.split(','))}
+    program = {i: int(v) for i, v in enumerate(raw_data.split(","))}
     computer = intcode.Computer(0, program)
     return computer.run([1])
 
 
 def day9p2(raw_data):
-    program = {i:int(v) for i, v in enumerate(raw_data.split(','))}
+    program = {i: int(v) for i, v in enumerate(raw_data.split(","))}
     computer = intcode.Computer(0, program)
     return computer.run([2])
 
 
-
 def day10p1(raw_data):
-    data = raw_data.split('\n')
+    data = raw_data.split("\n")
     l, h = len(data[0]), len(data)
     lignes = []
     return 1
 
+
 def day10p2(raw_data):
     return 1
-
-
-
-
-
