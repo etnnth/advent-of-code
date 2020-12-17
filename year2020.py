@@ -520,19 +520,13 @@ def day15p1(raw_data):
 
 
 def day15p2(raw_data):
-    positions = {}
     numbers = [int(i) for i in raw_data.split(",")]
+    positions = collections.defaultdict(lambda:index)
     for i, n in enumerate(numbers[:-1]):
         positions[n] = i + 1
-    index = len(numbers)
     number = numbers[-1]
     for index in range(len(numbers), 30_000_000):
-        if number not in positions:
-            number_temp = 0
-        else:
-            number_temp = index - positions[number]
-        positions[number] = index
-        number = number_temp
+        positions[number], number = index, index - positions[number]
     return number
 
 
