@@ -613,7 +613,7 @@ class ConwayND:
         self.dir = [
             d
             for d in itertools.product(range(-1, 2), repeat=dim)
-            if d != tuple([0] * dim)
+            if d != (0,) * dim
         ]
         self.active = set()
         for i, j in itertools.product(range(len(cube)), range(len(cube[0]))):
@@ -623,31 +623,17 @@ class ConwayND:
     def iteration(self):
         to_activate = set()
         to_deactivate = set()
+        counter = collections.defaultdict(int)
         inactive_neighbor = set()
-        for position in self.active:
-            for di in self.dir:
-                neighbor = tuple(p + d for p, d in zip(position, di))
-                if neighbor not in self.active:
-                    inactive_neighbor.add(neighbor)
+        for position, di in itertools.product(self.active, self.dir):
+            neighbor = tuple(p + d for p, d in zip(position, di))
+            counter[neighbor] += 1
 
-        for position in inactive_neighbor:
-            if self.count_active_neighbors(position) == 3:
-                to_activate.add(position)
-        for position in self.active:
-            if self.count_active_neighbors(position) not in (2, 3):
-                to_deactivate.add(position)
-
-        for position in to_deactivate:
-            self.active.remove(position)
-        for position in to_activate:
-            self.active.add(position)
-
-    def count_active_neighbors(self, position):
-        count = 0
-        for di in self.dir:
-            if tuple(p + d for p, d in zip(position, di)) in self.active:
-                count += 1
-        return count
+        self.active = {
+                position for position, count in counter.items() if (
+                    count == 3 or (count == 2 and position in self.active)
+                    )
+                }
 
 
 def day17p1(raw_data):
