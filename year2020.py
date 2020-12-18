@@ -521,12 +521,18 @@ def day15p1(raw_data):
 
 def day15p2(raw_data):
     numbers = [int(i) for i in raw_data.split(",")]
-    positions = collections.defaultdict(lambda:index)
+    positions = [-1] * 30_000_000
     for i, n in enumerate(numbers[:-1]):
         positions[n] = i + 1
     number = numbers[-1]
     for index in range(len(numbers), 30_000_000):
-        positions[number], number = index, index - positions[number]
+        p = positions[number]
+        if p == -1:
+            new_number = 0
+        else:
+            new_number = index - p
+        positions[number] = index
+        number = new_number
     return number
 
 
@@ -615,10 +621,7 @@ class ConwayND:
                 self.active.add(tuple([i, j] + [0] * (dim - 2)))
 
     def iteration(self):
-        to_activate = set()
-        to_deactivate = set()
         counter = collections.defaultdict(int)
-        inactive_neighbor = set()
         for position, di in itertools.product(self.active, self.dir):
             neighbor = tuple(p + d for p, d in zip(position, di))
             counter[neighbor] += 1
@@ -642,3 +645,87 @@ def day17p2(raw_data):
     for _ in range(6):
         cube.iteration()
     return len(cube.active)
+
+
+def add(a,b):
+    return a + b
+
+def mul(a,b):
+    return a * b
+
+def evaluate(items):
+    operators = {'+':add, '*':mul}
+    value = 0
+    operator = None
+    while items:
+        item = items.pop(0)
+        if item == '(':
+            count = 1
+            inside = []
+            while count > 0:
+                item = items.pop(0)
+                if item == '(':
+                    count += 1
+                elif item == ')':
+                    count -= 1
+                if count > 0:
+                    inside.append(item)
+            item = evaluate(inside)
+        if item not in ('+', '*'):
+            if operator is not None:
+                value = operator(value, int(item))
+            else:
+                value = int(item)
+        elif item in ('+', '*'):
+            operator = operators[item]
+
+    return value
+
+
+def evaluate2(items):
+    left = []
+    if '*' not in items:
+        return evaluate(items)
+    value = None
+    while items:
+        item = items.pop(0)
+        if item == '(':
+            count = 1
+            inside = []
+            while count > 0:
+                item = items.pop(0)
+                if item == '(':
+                    count += 1
+                elif item == ')':
+                    count -= 1
+                if count > 0:
+                    inside.append(item)
+            item = evaluate2(inside)
+        if item == '*':
+            value = (evaluate2(left or [1]) or 1) * (evaluate2(items or [1]) or 1)
+            left = [value]
+        else:
+            left.append(item)
+    return evaluate2(left + items)
+
+
+
+
+def day18p1(raw_data):
+    lines = raw_data.split('\n')
+    count = 0
+    for line in lines:
+        items = line.replace('(', ' ( ').replace(')', ' ) ').split()
+        count += evaluate(items)
+    return count
+
+
+def day18p2(raw_data):
+    lines = raw_data.split('\n')
+    count = 0
+    for line in lines:
+        items = line.replace('(', ' ( ').replace(')', ' ) ').split()
+        count += evaluate2(items)
+    return count
+
+
