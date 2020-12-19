@@ -2,6 +2,7 @@ import itertools
 import collections
 import copy
 import math
+import functools
 
 
 def day1p1(raw_data):
@@ -611,9 +612,7 @@ class ConwayND:
     def __init__(self, raw_data, dim):
         cube = [r for r in raw_data.split("\n")]
         self.dir = [
-            d
-            for d in itertools.product(range(-1, 2), repeat=dim)
-            if d != (0,) * dim
+            d for d in itertools.product(range(-1, 2), repeat=dim) if d != (0,) * dim
         ]
         self.active = set()
         for i, j in itertools.product(range(len(cube)), range(len(cube[0]))):
@@ -627,10 +626,10 @@ class ConwayND:
             counter[neighbor] += 1
 
         self.active = {
-                position for position, count in counter.items() if (
-                    count == 3 or (count == 2 and position in self.active)
-                    )
-                }
+            position
+            for position, count in counter.items()
+            if (count == 3 or (count == 2 and position in self.active))
+        }
 
 
 def day17p1(raw_data):
@@ -647,36 +646,38 @@ def day17p2(raw_data):
     return len(cube.active)
 
 
-def add(a,b):
+def add(a, b):
     return a + b
 
-def mul(a,b):
+
+def mul(a, b):
     return a * b
 
+
 def evaluate(items):
-    operators = {'+':add, '*':mul}
+    operators = {"+": add, "*": mul}
     value = 0
     operator = None
     while items:
         item = items.pop(0)
-        if item == '(':
+        if item == "(":
             count = 1
             inside = []
             while count > 0:
                 item = items.pop(0)
-                if item == '(':
+                if item == "(":
                     count += 1
-                elif item == ')':
+                elif item == ")":
                     count -= 1
                 if count > 0:
                     inside.append(item)
             item = evaluate(inside)
-        if item not in ('+', '*'):
+        if item not in ("+", "*"):
             if operator is not None:
                 value = operator(value, int(item))
             else:
                 value = int(item)
-        elif item in ('+', '*'):
+        elif item in ("+", "*"):
             operator = operators[item]
 
     return value
@@ -684,24 +685,24 @@ def evaluate(items):
 
 def evaluate2(items):
     left = []
-    if '*' not in items:
+    if "*" not in items:
         return evaluate(items)
     value = None
     while items:
         item = items.pop(0)
-        if item == '(':
+        if item == "(":
             count = 1
             inside = []
             while count > 0:
                 item = items.pop(0)
-                if item == '(':
+                if item == "(":
                     count += 1
-                elif item == ')':
+                elif item == ")":
                     count -= 1
                 if count > 0:
                     inside.append(item)
             item = evaluate2(inside)
-        if item == '*':
+        if item == "*":
             value = (evaluate2(left or [1]) or 1) * (evaluate2(items or [1]) or 1)
             left = [value]
         else:
@@ -709,23 +710,102 @@ def evaluate2(items):
     return evaluate2(left + items)
 
 
-
-
 def day18p1(raw_data):
-    lines = raw_data.split('\n')
+    lines = raw_data.split("\n")
     count = 0
     for line in lines:
-        items = line.replace('(', ' ( ').replace(')', ' ) ').split()
+        items = line.replace("(", " ( ").replace(")", " ) ").split()
         count += evaluate(items)
     return count
 
 
 def day18p2(raw_data):
-    lines = raw_data.split('\n')
+    lines = raw_data.split("\n")
     count = 0
     for line in lines:
-        items = line.replace('(', ' ( ').replace(')', ' ) ').split()
+        items = line.replace("(", " ( ").replace(")", " ) ").split()
         count += evaluate2(items)
     return count
+
+
+def expand(l):
+    return [v for ll in l for v in ll]
+
+
+
+class Rule:
+    def __init__(self, rules_str: str, max_size = math.inf):
+        self.max_size = max_size
+        self.rules = [
+            [int(v) for v in s.split(" ") if v.isdigit()]
+            for s in rules_str.split(" | ")
+        ]
+        self.rules = [r for r in self.rules if len(r)]
+        self.valids = [
+            "".join(v.replace('"', "") for v in s.split(" ") if not v.isdigit())
+            for s in rules_str.split(" | ")
+        ]
+        self.valids = [v for v in self.valids if len(v)]
+
+
+    def eval(self, rules):
+        for rule in self.rules:
+            for combinations in itertools.product(
+                    *(rules[rule_id].valids for rule_id in rule)
+                    ):
+                valid_message = ''.join(combinations)
+                self.valids.append(''.join(combinations))
+
+
+
+
+def day19p1(raw_data):
+    rules_data, messages = raw_data.split("\n\n")
+    max_size = max(len(m) for m in messages.split('\n'))
+    rules ={
+        int(i): Rule(s, max_size) for i, s in (r.split(": ") for r in rules_data.split("\n"))
+        }
+    stack = [0] # node list to visit
+    backtrack = []
+    while stack:
+        i = stack.pop(0)
+        next_rules = {j for j in set(expand(rules[i].rules)) if isinstance(j, int)}
+        if next_rules:
+            for j in next_rules:
+                stack.append(j)
+            backtrack.append(i)
+    backtrack.reverse()
+    visited = set()
+    for i in backtrack:
+        if i not in visited:
+            rules[i].eval(rules)
+            visited.add(i)
+    print(len(rules[0].valids))
+    return len(set(rules[0].valids) & {m for m in messages.split('\n')})
+
+def day19p2(raw_data):
+    rules_data, messages = raw_data.split("\n\n")
+    max_size = max(len(m) for m in messages.split('\n'))
+    rules ={
+        int(i): Rule(s, max_size) for i, s in (r.split(": ") for r in rules_data.split("\n"))
+        }
+    stack = [0] # node list to visit
+    backtrack = []
+    while stack:
+        i = stack.pop(0)
+        next_rules = {j for j in set(expand(rules[i].rules)) if isinstance(j, int)}
+        if next_rules:
+            for j in next_rules:
+                stack.append(j)
+            backtrack.append(i)
+    backtrack.reverse()
+    visited = set()
+    for i in backtrack:
+        if i not in visited:
+            rules[i].eval(rules)
+            visited.add(i)
+            rules[i].valids = [v for v in rules[i].valids if len(v)]
+    print(len(rules[0].valids))
+    return len(set(rules[0].valids) & {m for m in messages.split('\n')})
 
 
