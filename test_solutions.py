@@ -4,7 +4,7 @@ import pytest
 import year2019
 import year2020
 
-years = {2019: 9, 2020: 19}
+years = {2019: 9, 2020: 21}
 
 file = "datas.db"
 tests = []

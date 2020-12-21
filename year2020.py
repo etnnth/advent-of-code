@@ -728,33 +728,90 @@ def day18p2(raw_data):
     return count
 
 
+
+
+
+
+
+def expand(l):
+    return [v for ll in l for v in ll]
+
+
+
+class Rule:
+    def __init__(self, rules_str: str, max_size = math.inf):
+        self.max_size = max_size
+        self.rules = [
+            [int(v) for v in s.split(" ") if v.isdigit()]
+            for s in rules_str.split(" | ")
+        ]
+        self.rules = [r for r in self.rules if len(r)]
+        self.valids = [
+            "".join(v.replace('"', "") for v in s.split(" ") if not v.isdigit())
+            for s in rules_str.split(" | ")
+        ]
+        self.valids = [v for v in self.valids if len(v)]
+
+
+    def eval(self, rules):
+        for rule in self.rules:
+            for combinations in itertools.product(
+                    *(rules[rule_id].valids for rule_id in rule)
+                    ):
+                valid_message = ''.join(combinations)
+                self.valids.append(''.join(combinations))
+
+
+
+
 def day19p1(raw_data):
-    rules_data, messages_data = raw_data.split("\n\n")
-    messages = [" " + " ".join(list(m)) + " " for m in messages_data.split('\n')]
-    rules = {}
-    for rule in rules_data.split("\n"):
-        rule_id, sub_rules_data = rule.split(": ")
-        for sub_rule_data in sub_rules_data.split(" | "):
-            if '"' in sub_rule_data:
-                value = sub_rule_data.replace('"', '')
-            else:
-                value = sub_rule_data
-            rules[f" {value} "] = f" {rule_id} "
-
-    for message in messages:
-        for _ in range(30):
-            for value, rule in rules.items():
-                message = message.replace(value, rule)
-        print(message)
-
-    return 1
-
-
+    rules_data, messages = raw_data.split("\n\n")
+    max_size = max(len(m) for m in messages.split('\n'))
+    rules ={
+        int(i): Rule(s, max_size) for i, s in (r.split(": ") for r in rules_data.split("\n"))
+        }
+    stack = [0] # node list to visit
+    backtrack = []
+    while stack:
+        i = stack.pop(0)
+        next_rules = {j for j in set(expand(rules[i].rules)) if isinstance(j, int)}
+        if next_rules:
+            for j in next_rules:
+                stack.append(j)
+            backtrack.append(i)
+    backtrack.reverse()
+    visited = set()
+    for i in backtrack:
+        if i not in visited:
+            rules[i].eval(rules)
+            visited.add(i)
+    print(len(rules[0].valids))
+    return len(set(rules[0].valids) & {m for m in messages.split('\n')})
 
 def day19p2(raw_data):
-    return 1
-
-
+    rules_data, messages = raw_data.split("\n\n")
+    max_size = max(len(m) for m in messages.split('\n'))
+    rules ={
+        int(i): Rule(s, max_size) for i, s in (r.split(": ") for r in rules_data.split("\n"))
+        }
+    stack = [0] # node list to visit
+    backtrack = []
+    while stack:
+        i = stack.pop(0)
+        next_rules = {j for j in set(expand(rules[i].rules)) if isinstance(j, int)}
+        if next_rules:
+            for j in next_rules:
+                stack.append(j)
+            backtrack.append(i)
+    backtrack.reverse()
+    visited = set()
+    for i in backtrack:
+        if i not in visited:
+            rules[i].eval(rules)
+            visited.add(i)
+            rules[i].valids = [v for v in rules[i].valids if len(v)]
+    print(len(rules[0].valids))
+    return len(set(rules[0].valids) & {m for m in messages.split('\n')})
 
 def day20p1(raw_data):
     sides = collections.defaultdict(list)
@@ -811,4 +868,66 @@ def day20p2(raw_data):
 
 
     return product_corner_id
+
+
+
+def day21p1(raw_data):
+    foods_list = []
+    allergens_list = []
+    for line in raw_data.split('\n'):
+        line = line.replace(",", "")
+        foods, allergens = line[:-1].split(" (contains ")
+        foods_list.append(set(foods.split(" ")))
+        allergens_list.append(set(allergens.split(" ")))
+
+    all_ingredient = set()
+    for food in foods_list:
+        all_ingredient |= food
+
+    possible_ingredient = collections.defaultdict(lambda: copy.copy(all_ingredient))
+    for food, allergens in zip(foods_list, allergens_list):
+        for allergen in allergens:
+            possible_ingredient[allergen] &= food
+
+    cannot_contain_allergen = all_ingredient
+    for allergen, ingredients in possible_ingredient.items():
+        cannot_contain_allergen -= ingredients
+
+    return sum(len(ingredients & cannot_contain_allergen) for ingredients in foods_list)
+
+
+def day21p2(raw_data):
+    foods_list = []
+    allergens_list = []
+    for line in raw_data.split('\n'):
+        line = line.replace(",", "")
+        foods, allergens = line[:-1].split(" (contains ")
+        foods_list.append(set(foods.split(" ")))
+        allergens_list.append(set(allergens.split(" ")))
+
+    all_ingredient = set()
+    for food in foods_list:
+        all_ingredient |= food
+
+    possible_ingredient = collections.defaultdict(lambda: copy.copy(all_ingredient))
+    for food, allergens in zip(foods_list, allergens_list):
+        for allergen in allergens:
+            possible_ingredient[allergen] &= food
+
+    for _ in range(len(possible_ingredient)):
+        for allergen, ingredients in possible_ingredient.items():
+            if len(ingredients) == 1:
+                for other_allergen in possible_ingredient:
+                    if allergen != other_allergen:
+                        possible_ingredient[other_allergen] -= ingredients
+
+    allergen_per_ingredient = {}
+    for allergen, ingredients in possible_ingredient.items():
+        assert len(ingredients) == 1
+        allergen_per_ingredient[list(ingredients)[0]] = allergen
+    list_ingredients = sorted(
+            (ingredient for ingredient in allergen_per_ingredient),
+            key = lambda i:allergen_per_ingredient[i])
+    return ','.join(list_ingredients)
+
 
