@@ -728,84 +728,87 @@ def day18p2(raw_data):
     return count
 
 
-def expand(l):
-    return [v for ll in l for v in ll]
-
-
-
-class Rule:
-    def __init__(self, rules_str: str, max_size = math.inf):
-        self.max_size = max_size
-        self.rules = [
-            [int(v) for v in s.split(" ") if v.isdigit()]
-            for s in rules_str.split(" | ")
-        ]
-        self.rules = [r for r in self.rules if len(r)]
-        self.valids = [
-            "".join(v.replace('"', "") for v in s.split(" ") if not v.isdigit())
-            for s in rules_str.split(" | ")
-        ]
-        self.valids = [v for v in self.valids if len(v)]
-
-
-    def eval(self, rules):
-        for rule in self.rules:
-            for combinations in itertools.product(
-                    *(rules[rule_id].valids for rule_id in rule)
-                    ):
-                valid_message = ''.join(combinations)
-                self.valids.append(''.join(combinations))
-
-
-
-
 def day19p1(raw_data):
-    rules_data, messages = raw_data.split("\n\n")
-    max_size = max(len(m) for m in messages.split('\n'))
-    rules ={
-        int(i): Rule(s, max_size) for i, s in (r.split(": ") for r in rules_data.split("\n"))
-        }
-    stack = [0] # node list to visit
-    backtrack = []
-    while stack:
-        i = stack.pop(0)
-        next_rules = {j for j in set(expand(rules[i].rules)) if isinstance(j, int)}
-        if next_rules:
-            for j in next_rules:
-                stack.append(j)
-            backtrack.append(i)
-    backtrack.reverse()
-    visited = set()
-    for i in backtrack:
-        if i not in visited:
-            rules[i].eval(rules)
-            visited.add(i)
-    print(len(rules[0].valids))
-    return len(set(rules[0].valids) & {m for m in messages.split('\n')})
+    rules_data, messages_data = raw_data.split("\n\n")
+    messages = [" " + " ".join(list(m)) + " " for m in messages_data.split('\n')]
+    rules = {}
+    for rule in rules_data.split("\n"):
+        rule_id, sub_rules_data = rule.split(": ")
+        for sub_rule_data in sub_rules_data.split(" | "):
+            if '"' in sub_rule_data:
+                value = sub_rule_data.replace('"', '')
+            else:
+                value = sub_rule_data
+            rules[f" {value} "] = f" {rule_id} "
+
+    for message in messages:
+        for _ in range(30):
+            for value, rule in rules.items():
+                message = message.replace(value, rule)
+        print(message)
+
+    return 1
+
+
 
 def day19p2(raw_data):
-    rules_data, messages = raw_data.split("\n\n")
-    max_size = max(len(m) for m in messages.split('\n'))
-    rules ={
-        int(i): Rule(s, max_size) for i, s in (r.split(": ") for r in rules_data.split("\n"))
-        }
-    stack = [0] # node list to visit
-    backtrack = []
-    while stack:
-        i = stack.pop(0)
-        next_rules = {j for j in set(expand(rules[i].rules)) if isinstance(j, int)}
-        if next_rules:
-            for j in next_rules:
-                stack.append(j)
-            backtrack.append(i)
-    backtrack.reverse()
-    visited = set()
-    for i in backtrack:
-        if i not in visited:
-            rules[i].eval(rules)
-            visited.add(i)
-            rules[i].valids = [v for v in rules[i].valids if len(v)]
-    print(len(rules[0].valids))
-    return len(set(rules[0].valids) & {m for m in messages.split('\n')})
+    return 1
 
+
+
+def day20p1(raw_data):
+    sides = collections.defaultdict(list)
+    neighbors_count = collections.defaultdict(int)
+    for tile_data in raw_data.split("\n\n"):
+        tile_data_lines = tile_data.split("\n")
+        tile_id = int(tile_data_lines.pop(0).split(" ")[-1][:-1])
+        sides[tile_data_lines[0]].append(tile_id)
+        sides[tile_data_lines[-1]].append(tile_id)
+        sides[tile_data_lines[0][::-1]].append(tile_id)
+        sides[tile_data_lines[-1][::-1]].append(tile_id)
+        transposed_tile = [''.join(c) for c in zip(*tile_data_lines)]
+        sides[transposed_tile[0]].append(tile_id)
+        sides[transposed_tile[-1]].append(tile_id)
+        sides[transposed_tile[0][::-1]].append(tile_id)
+        sides[transposed_tile[-1][::-1]].append(tile_id)
+    for side, list_tile in sides.items():
+        for tile in list_tile:
+            neighbors_count[tile] += len(list_tile) - 1
+    for tile_id in neighbors_count:
+        neighbors_count[tile_id] //= 2
+    product_corner_id = 1
+    for tile_id, count in neighbors_count.items():
+        if count == 2:
+            product_corner_id *= tile_id
+    return product_corner_id
+
+def day20p2(raw_data):
+    sides = collections.defaultdict(list)
+    neighbors_count = collections.defaultdict(int)
+    tiles = {}
+    for tile_data in raw_data.split("\n\n"):
+        tile_data_lines = tile_data.split("\n")
+        tile_id = int(tile_data_lines.pop(0).split(" ")[-1][:-1])
+        tiles[tile_id] = tile_data_lines
+        sides[tile_data_lines[0]].append(tile_id)
+        sides[tile_data_lines[-1]].append(tile_id)
+        sides[tile_data_lines[0][::-1]].append(tile_id)
+        sides[tile_data_lines[-1][::-1]].append(tile_id)
+        transposed_tile = [''.join(c) for c in zip(*tile_data_lines)]
+        sides[transposed_tile[0]].append(tile_id)
+        sides[transposed_tile[-1]].append(tile_id)
+        sides[transposed_tile[0][::-1]].append(tile_id)
+        sides[transposed_tile[-1][::-1]].append(tile_id)
+    for side, list_tile in sides.items():
+        for tile in list_tile:
+            neighbors_count[tile] += len(list_tile) - 1
+    for tile_id in neighbors_count:
+        neighbors_count[tile_id] //= 2
+    tile_array = [[]]
+    for tile_id, tile in tiles.items:
+        if neighbors_count[tile_id] == 2:
+            pass
+
+
+    return product_corner_id
 
