@@ -930,4 +930,64 @@ def day21p2(raw_data):
             key = lambda i:allergen_per_ingredient[i])
     return ','.join(list_ingredients)
 
+def day22p1(raw_data):
+    player1_data, player2_data = raw_data.split('\n\n')
+    deck1 = [int(i) for i in player1_data.split("\n")[1:]]
+    deck2 = [int(i) for i in player2_data.split("\n")[1:]]
+    while deck1 and deck2:
+        card1, card2 = deck1.pop(0), deck2.pop(0)
+        if card1 > card2:
+            deck1 += [card1, card2]
+        elif card2 > card1:
+            deck2 += [card2, card1]
+        else: print('====')
+    count = 0
+    deck = deck1 + deck2
+    deck.reverse()
+    for i,c in enumerate(deck):
+        count += c * (i + 1)
+    return count
+
+
+def recursive_game(deck1, deck2): # return True if player 1 wins
+    previous1, previous2 = set(), set()
+    while deck1 and deck2:
+        t1, t2 = tuple(deck1), tuple(deck2)
+        if t1 in previous1 or t2 in previous2:
+            return True
+        previous1.add(t1)
+        previous2.add(t2)
+        card1, card2 = deck1.pop(0), deck2.pop(0)
+        if len(deck1) >= card1 and len(deck2) >= card2:
+            if recursive_game(copy.copy(deck1[:card1]), copy.copy(deck2[:card2])):
+                deck1 += [card1, card2]
+            else:
+                deck2 += [card2, card1]
+        else:
+            if card1 > card2:
+                deck1 += [card1, card2]
+            elif card2 > card1:
+                deck2 += [card2, card1]
+    if deck1:
+        return True
+    return False
+
+
+
+
+def day22p2(raw_data):
+    player1_data, player2_data = raw_data.split('\n\n')
+    deck1 = [int(i) for i in player1_data.split("\n")[1:]]
+    deck2 = [int(i) for i in player2_data.split("\n")[1:]]
+    recursive_game(deck1, deck2)
+    count = 0
+    deck = deck1 + deck2
+    deck.reverse()
+    for i,c in enumerate(deck):
+        count += c * (i + 1)
+    return count
+
+
+
+
 
