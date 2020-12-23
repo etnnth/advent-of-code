@@ -1019,11 +1019,9 @@ def day23p2(raw_data):
     max_input = max(input_cups)
     max_cup_value = 1_000_000
 
-    cups = {} # dict that take the role of a linked list
+    cups = [i + 1 for i in range(max_cup_value + 1)] # list that take the role of a linked list
     for c1, c2 in zip(input_cups[:-1], input_cups[1:]):
         cups[c1] = c2
-    for c in range(max_input + 1, max_cup_value):
-        cups[c] = c + 1
     cups[input_cups[-1]] = max_input + 1
     cups[max_cup_value] = input_cups[0] # loop back to 0 
 
