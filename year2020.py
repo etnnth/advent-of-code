@@ -988,6 +988,60 @@ def day22p2(raw_data):
     return count
 
 
+def day23p1(raw_data):
+    cups = [int(i) - 1 for i in raw_data]
+    number = len(cups)
+    index = 0 # index of the current cup
+    for _ in range(100):
+        current_cup = cups[index]
+        index = (index + 1) % number
+        picked_cups = []
+        for _ in range(3):
+            if index < len(cups):
+                picked_cups.append(cups.pop(index))
+            else:
+                picked_cups.append(cups.pop(0))
+        target = (current_cup - 1 + number) % number
+        while target in picked_cups:
+            target  = (target - 1 + number) % number
+        target_index = cups.index(target)
+        for i, c in enumerate(picked_cups):
+            cups.insert(i + 1 + target_index, c)
+        while cups[index-1] != current_cup:
+            cups = cups[-1:] + cups[:-1]
+    while cups[0] != 0:
+            cups = cups[-1:] + cups[:-1]
+    return ''.join([str(c + 1) for c in cups[1:]])
+
+
+def day23p2(raw_data):
+    input_cups = [int(i) for i in raw_data]
+    max_input = max(input_cups)
+    max_cup_value = 1_000_000
+
+    cups = {} # dict that take the role of a linked list
+    for c1, c2 in zip(input_cups[:-1], input_cups[1:]):
+        cups[c1] = c2
+    for c in range(max_input + 1, max_cup_value):
+        cups[c] = c + 1
+    cups[input_cups[-1]] = max_input + 1
+    cups[max_cup_value] = input_cups[0] # loop back to 0 
+
+    cup = input_cups[0] # initialize at the first cup
+    for _ in range(10_000_000):
+        picked = [cups[cup]]
+        picked.append(cups[picked[-1]])
+        picked.append(cups[picked[-1]])
+        target = cup - 1 or max_cup_value
+        while target in picked:
+            target = target - 1 or max_cup_value
+        cups[cup], cups[picked[-1]], cups[target] = cups[picked[-1]], cups[target], picked[0]
+        cup = cups[cup]
+
+    return cups[1] * cups[cups[1]]
+
+
+
 
 
 

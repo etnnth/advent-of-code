@@ -4,25 +4,13 @@ import database
 
 
 year = 2020
-day = 22
+day = 23
 f = f"year{year}.day{day}"
 
 with database.Database("datas.db") as db:
     raw_data = db.data(year, day)
 
-test_data1 = """Player 1:
-9
-2
-6
-3
-1
-
-Player 2:
-5
-8
-4
-7
-10"""
+test_data1 = """389125467"""
 
 
 test_data2 = test_data1
