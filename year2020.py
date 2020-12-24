@@ -840,34 +840,12 @@ def day20p1(raw_data):
     return product_corner_id
 
 def day20p2(raw_data):
-    sides = collections.defaultdict(list)
-    neighbors_count = collections.defaultdict(int)
     tiles = {}
     for tile_data in raw_data.split("\n\n"):
-        tile_data_lines = tile_data.split("\n")
-        tile_id = int(tile_data_lines.pop(0).split(" ")[-1][:-1])
-        tiles[tile_id] = tile_data_lines
-        sides[tile_data_lines[0]].append(tile_id)
-        sides[tile_data_lines[-1]].append(tile_id)
-        sides[tile_data_lines[0][::-1]].append(tile_id)
-        sides[tile_data_lines[-1][::-1]].append(tile_id)
-        transposed_tile = [''.join(c) for c in zip(*tile_data_lines)]
-        sides[transposed_tile[0]].append(tile_id)
-        sides[transposed_tile[-1]].append(tile_id)
-        sides[transposed_tile[0][::-1]].append(tile_id)
-        sides[transposed_tile[-1][::-1]].append(tile_id)
-    for side, list_tile in sides.items():
-        for tile in list_tile:
-            neighbors_count[tile] += len(list_tile) - 1
-    for tile_id in neighbors_count:
-        neighbors_count[tile_id] //= 2
-    tile_array = [[]]
-    for tile_id, tile in tiles.items:
-        if neighbors_count[tile_id] == 2:
-            pass
-
-
-    return product_corner_id
+        lines = tile_data.split("\n")
+        tiles[int(lines[0].split(" ")[-1][:-1])] = lines[1:]
+    size = len(lines) - 1
+    return 2
 
 
 
@@ -1039,6 +1017,71 @@ def day23p2(raw_data):
     return cups[1] * cups[cups[1]]
 
 
+def day24p1(raw_data):
+    black_tile = set()
+    # position 2D (x, y)
+    # e => (1, 0)
+    # w => (-1 , 0)
+    # nw => (-1, 1)
+    # se => (1, -1)
+    # ne => (0, 1)
+    # sw => (0, -1)
+    for line in raw_data.split("\n"):
+        count_NW = line.count("nw")
+        count_SW = line.count("sw")
+        count_NE = line.count("ne")
+        count_SE = line.count("se")
+        count_E = line.count("e") - count_NE - count_SE
+        count_W = line.count("w") - count_NW - count_SW
+        position = (
+                count_E + count_SE - count_W - count_NW,
+                count_NE + count_NW - count_SW - count_SE
+                )
+        if position in black_tile:
+            black_tile.remove(position)
+        else:
+            black_tile.add(position)
+
+    return len(black_tile)
+
+
+
+
+def day24p2(raw_data):
+    black_tile = set()
+    # position 2D (x, y)
+    # e => (1, 0)
+    # w => (-1 , 0)
+    # nw => (-1, 1)
+    # se => (1, -1)
+    # ne => (0, 1)
+    # sw => (0, -1)
+    for line in raw_data.split("\n"):
+        count_NW = line.count("nw")
+        count_SW = line.count("sw")
+        count_NE = line.count("ne")
+        count_SE = line.count("se")
+        count_E = line.count("e") - count_NE - count_SE
+        count_W = line.count("w") - count_NW - count_SW
+        position = (
+                count_E + count_SE - count_W - count_NW,
+                count_NE + count_NW - count_SW - count_SE
+                )
+        if position in black_tile:
+            black_tile.remove(position)
+        else:
+            black_tile.add(position)
+    directions = {(1, 0), (-1, 0), (-1, 1), (1, -1), (0, 1), (0, -1)}
+    for _ in range(100):
+        count = collections.defaultdict(int)
+        for x, y in black_tile:
+            for dx, dy in directions:
+                count[(x + dx, y + dy)] += 1
+        black_tile = (
+                { tile for tile in black_tile if 1 <= count[tile] <= 2 } |
+                { tile for tile in count if count[tile] == 2 and tile not in black_tile }
+                )
+    return len(black_tile)
 
 
 
