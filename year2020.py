@@ -1084,5 +1084,20 @@ def day24p2(raw_data):
     return len(black_tile)
 
 
-
+def day25p1(raw_data):
+    card_public_key, door_public_key = (int(n) for n in raw_data.split("\n"))
+    card_loop_size, door_loop_size = 0, 0
+    loop = 0
+    number = 1
+    while card_loop_size == 0 or door_loop_size == 0:
+        number = (number * 7) % 20201227
+        loop += 1
+        if number == card_public_key:
+            card_loop_size = loop
+        if number == door_public_key:
+            door_loop_size = loop
+    key = 1
+    for _ in range(door_loop_size):
+        key = (key * card_public_key) % 20201227
+    return key
 
