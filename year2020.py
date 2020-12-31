@@ -3,6 +3,7 @@ import collections
 import copy
 import math
 import functools
+import random
 
 
 def day1p1(raw_data):
@@ -839,14 +840,99 @@ def day20p1(raw_data):
             product_corner_id *= tile_id
     return product_corner_id
 
+def rotate(m): # rotate matrix m anticlockwise
+    return [c for c in zip(*m)][::-1]
+
+def flipping(m):
+    return m[::-1]
+
+def find_placement(tiles, placement, placed_tile, free_tile):
+    x, y = placement[placed_tile]
+    placed_tile_borders = [
+            tiles[placed_tile][0],
+            tiles[placed_tile][-1],
+            tuple([r[0] for r in tiles[placed_tile]]),
+            tuple([r[-1] for r in tiles[placed_tile]])
+            ]
+    free_tile_borders = [
+            tiles[free_tile][0],
+            tiles[free_tile][-1],
+            tuple([r[0] for r in tiles[free_tile]]),
+            tuple([r[-1] for r in tiles[free_tile]])
+            ]
+
+    if any(b1==b2 or b1 == b2[::-1]
+            for b1, b2 in itertools.product(placed_tile_borders, free_tile_borders)):
+        for _ in range(4):
+            for _ in range(2):
+                if tiles[placed_tile][0] == tiles[free_tile][-1]:
+                    placement[free_tile] = (x, y + 1)
+                    return True
+                if tiles[placed_tile][-1] == tiles[free_tile][0]:
+                    placement[free_tile] = (x, y - 1)
+                    return True
+                if [r[0] for r in tiles[placed_tile]] == [r[-1] for r in tiles[free_tile]]:
+                    placement[free_tile] = (x - 1, y)
+                    return True
+                if [r[-1] for r in tiles[placed_tile]] == [r[0] for r in tiles[free_tile]]:
+                    placement[free_tile] = (x + 1, y)
+                    return True
+                tiles[free_tile] = flipping(tiles[free_tile])
+            tiles[free_tile] = rotate(tiles[free_tile])
+    return False
+
+
 def day20p2(raw_data):
-    tiles = {}
+    tiles = {} # tile id : tile data as list of str 
+    placement = {} # tile id : (x, y)
     for tile_data in raw_data.split("\n\n"):
         lines = tile_data.split("\n")
-        tiles[int(lines[0].split(" ")[-1][:-1])] = lines[1:]
+        tiles[int(lines[0].split(" ")[-1][:-1])] = [tuple(line) for line in lines[1:]]
     size = len(lines) - 1
-    return 2
 
+    first_tile = random.choice([tile_id for tile_id in tiles])
+    placement[first_tile] = (0, 0)
+    while len(placement) != len(tiles):
+        for placed_tile, free_tile in itertools.product(
+                placement,
+                (tile for tile in tiles if tile not in placement)
+                ):
+            if find_placement(tiles, placement, placed_tile, free_tile):
+                break
+    tile_grid = {}
+    for tile_id in tiles:
+        tile_grid[placement[tile_id]] = tiles[tile_id]
+    x = sorted(list(set(x for x, _ in placement.values())))
+    y = sorted(list(set(y for _, y in placement.values())), reverse=True)
+
+    image = []
+    monster = [
+            "                  # ",
+            "#    ##    ##    ###",
+            " #  #  #  #  #  #   "
+            ]
+
+    for yy in y:
+        for i in range(1, size - 1):
+            ligne = [''.join(tile_grid[(xx, yy)][i][1:-1]) for xx in x]
+            image.append(''.join(ligne))
+    count = sum(line.count("#") for line in image)
+    count_per_monster = sum(line.count("#") for line in monster)
+    for _ in range(4):
+        for _ in range(2):
+            l = len(image[0])
+            image = [list(line) for line in image]
+            for i in range(len(image)-2):
+                for j in range(l + 1 - len(monster[0])):
+                    if (
+                            all(s == m for s, m in zip(image[i][j:], monster[0]) if m == "#")
+                            and all(s == m for s, m in zip(image[i+1][j:], monster[1]) if m == "#")
+                            and all(s == m for s, m in zip(image[i+2][j:], monster[2]) if m == "#")
+                            ):
+                        count -= count_per_monster
+            image = flipping(image)
+        image = rotate(image)
+    return count
 
 
 def day21p1(raw_data):

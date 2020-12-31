@@ -13,4 +13,6 @@ tests: image.build
 benchmark: image.build
 	${RUN_IN_DOCKER} advent-of-code pytest --durations=0
 
+current: image.build
+	${RUN_IN_DOCKER} advent-of-code pypy current.py
 

@@ -4,32 +4,119 @@ import database
 
 
 year = 2020
-day = 24
+day = 20
 f = f"year{year}.day{day}"
 
 with database.Database("datas.db") as db:
     raw_data = db.data(year, day)
 
-test_data1 = """sesenwnenenewseeswwswswwnenewsewsw
-neeenesenwnwwswnenewnwwsewnenwseswesw
-seswneswswsenwwnwse
-nwnwneseeswswnenewneswwnewseswneseene
-swweswneswnenwsewnwneneseenw
-eesenwseswswnenwswnwnwsewwnwsene
-sewnenenenesenwsewnenwwwse
-wenwwweseeeweswwwnwwe
-wsweesenenewnwwnwsenewsenwwsesesenwne
-neeswseenwwswnwswswnw
-nenwswwsewswnenenewsenwsenwnesesenew
-enewnwewneswsewnwswenweswnenwsenwsw
-sweneswneswneneenwnewenewwneswswnese
-swwesenesewenwneswnwwneseswwne
-enesenwswwswneneswsenwnewswseenwsese
-wnwnesenesenenwwnenwsewesewsesesew
-nenewswnwewswnenesenwnesewesw
-eneswnwswnwsenenwnwnwwseeswneewsenese
-neswnwewnwnwseenwseesewsenwsweewe
-wseweeenwnesenwwwswnew"""
+test_data1 = """Tile 2311:
+..##.#..#.
+##..#.....
+#...##..#.
+####.#...#
+##.##.###.
+##...#.###
+.#.#.#..##
+..#....#..
+###...#.#.
+..###..###
+
+Tile 1951:
+#.##...##.
+#.####...#
+.....#..##
+#...######
+.##.#....#
+.###.#####
+###.##.##.
+.###....#.
+..#.#..#.#
+#...##.#..
+
+Tile 1171:
+####...##.
+#..##.#..#
+##.#..#.#.
+.###.####.
+..###.####
+.##....##.
+.#...####.
+#.##.####.
+####..#...
+.....##...
+
+Tile 1427:
+###.##.#..
+.#..#.##..
+.#.##.#..#
+#.#.#.##.#
+....#...##
+...##..##.
+...#.#####
+.#.####.#.
+..#..###.#
+..##.#..#.
+
+Tile 1489:
+##.#.#....
+..##...#..
+.##..##...
+..#...#...
+#####...#.
+#..#.#.#.#
+...#.#.#..
+##.#...##.
+..##.##.##
+###.##.#..
+
+Tile 2473:
+#....####.
+#..#.##...
+#.##..#...
+######.#.#
+.#...#.#.#
+.#########
+.###.#..#.
+########.#
+##...##.#.
+..###.#.#.
+
+Tile 2971:
+..#.#....#
+#...###...
+#.#.###...
+##.##..#..
+.#####..##
+.#..####.#
+#..#.#..#.
+..####.###
+..#.#.###.
+...#.#.#.#
+
+Tile 2729:
+...#.#.#.#
+####.#....
+..#.#.....
+....#..#.#
+.##..##.#.
+.#.####...
+####.#.#..
+##.####...
+##..#.##..
+#.##...##.
+
+Tile 3079:
+#.#.#####.
+.#..######
+..#.......
+######....
+####.#..#.
+.#...#.##.
+#.#####.##
+..#.###...
+..#.......
+..#.###..."""
 
 
 test_data2 = test_data1
